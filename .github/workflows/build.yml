@@ -67,7 +67,7 @@ jobs:
 
       # https://github.com/crazy-max/ghaction-xgo?tab=readme-ov-file#usage
       - name: 'Build release binaries'
-        uses: crazy-max/ghaction-xgo@v2
+        uses: crazy-max/ghaction-xgo@v3
         with:
           xgo_version: latest
           go_version: 1.21
