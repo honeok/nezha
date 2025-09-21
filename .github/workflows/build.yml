@@ -27,7 +27,7 @@ env:
 
 jobs:
   release_v0:
-    name: 'Release ${{ matrix.NEZHA_VERSION }} Binary'
+    name: 'Release ${{ matrix.NEZHA_VERSION }} binary'
     runs-on: ubuntu-latest
 
     strategy:
@@ -54,6 +54,13 @@ jobs:
           mkdir -p ${{ github.workspace }}/v0/source
           cd ${{ github.workspace }}/v0/source
           git clone --depth=1 --branch ${{ matrix.NEZHA_VERSION }} https://github.com/nezhahq/nezha.git .
+
+      - name: 'Replace static resources'
+        working-directory: ${{ github.workspace }}/v0/source
+        run: |
+          cp ../build.sh .
+          chmod +x build.sh
+          ./build.sh
 
       - name: 'Fetch ipinfo geoip database'
         working-directory: ${{ github.workspace }}/v0/source
@@ -121,7 +128,7 @@ jobs:
           tag: ${{ matrix.NEZHA_VERSION }}
 
   build_v0:
-    name: 'Build ${{ matrix.NEZHA_VERSION }} Image'
+    name: 'Build ${{ matrix.NEZHA_VERSION }} image'
     runs-on: ubuntu-latest
 
     strategy:
@@ -179,7 +186,7 @@ jobs:
           push: true
 
   build_v1:
-    name: 'Build v1 Image'
+    name: 'Build v1 image'
     runs-on: ubuntu-latest
 
     steps:
