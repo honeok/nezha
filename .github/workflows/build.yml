@@ -7,7 +7,7 @@ name: 'Build nezha-dashboard'
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
   schedule:
     - cron: '0 16 1 * *'
   workflow_dispatch:
@@ -22,7 +22,7 @@ defaults:
 
 env:
   IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
-  DOCKER_USERNAME: ${{ GITHUB.REPOSITORY_OWNER }}
+  DOCKER_USERNAME: ${{ github.repository_owner }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
@@ -51,19 +51,19 @@ jobs:
 
       - name: 'Clone source code for ${{ matrix.NEZHA_VERSION }}'
         run: |
-          mkdir -p ${{ GITHUB.WORKSPACE }}/v0/source
-          cd ${{ GITHUB.WORKSPACE }}/v0/source
+          mkdir -p ${{ github.workspace }}/v0/source
+          cd ${{ github.workspace }}/v0/source
           git clone --depth=1 --branch ${{ matrix.NEZHA_VERSION }} https://github.com/nezhahq/nezha.git .
 
       - name: 'Fetch ipinfo geoip database'
-        working-directory: ${{ GITHUB.WORKSPACE }}/v0/source
+        working-directory: ${{ github.workspace }}/v0/source
         run: |
           rm -f pkg/geoip/geoip.db
           wget --tries=50 -qO pkg/geoip/geoip.db "https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}"
 
       - name: 'Extract version number'
         id: bump_version
-        run: echo "version=$(sed 's/^v//' <<< ${{ matrix.NEZHA_VERSION }})" >> "$GITHUB_OUTPUT"
+        run: echo "nezha_version=$(sed 's/^v//' <<< ${{ matrix.NEZHA_VERSION }})" >> "$GITHUB_OUTPUT"
 
       # https://github.com/crazy-max/ghaction-xgo?tab=readme-ov-file#usage
       - name: 'Build release binaries'
@@ -79,19 +79,19 @@ jobs:
           x: false
           race: false
           tags: timetzdata
-          ldflags: -s -w --extldflags '-static -fpic' -X github.com/naiba/nezha/service/singleton.Version=${{ steps.bump_version.outputs.version }}
+          ldflags: -s -w --extldflags '-static -fpic' -X github.com/naiba/nezha/service/singleton.Version=${{ steps.bump_version.outputs.nezha_version }}
           buildmode: default
           trimpath: true
-          working_dir: ${{ GITHUB.WORKSPACE }}/v0/source
+          working_dir: ${{ github.workspace }}/v0/source
 
       - name: 'Package release assets'
-        working-directory: ${{ GITHUB.WORKSPACE }}/v0/source
+        working-directory: ${{ github.workspace }}/v0/source
         run: |
           cd build
           for FILE in *; do
             if [ -f "$FILE" ]; then
               PLATFORM=${FILE#dashboard-}
-              PACKAGE_NAME="dashboard-${{ steps.bump_version.outputs.version }}-${PLATFORM}"
+              PACKAGE_NAME="dashboard-${{ steps.bump_version.outputs.nezha_version }}-${PLATFORM}"
               mkdir "$PACKAGE_NAME"
               cp "$FILE" "${PACKAGE_NAME}/dashboard"
               sha256sum "${PACKAGE_NAME}/dashboard" | sed 's| .*| dashboard|' > "${PACKAGE_NAME}/checksum.txt"
@@ -111,7 +111,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: ${{ GITHUB.WORKSPACE }}/v0/source/build/*.tar.gz
+          artifacts: ${{ github.workspace }}/v0/source/build/*.tar.gz
           body: |
             Automated release of nezha-dashboard version ${{ matrix.NEZHA_VERSION }}.
             Binaries are built from official repositories.
@@ -138,7 +138,7 @@ jobs:
           fetch-depth: 0
 
       - name: 'Fetch ipinfo geoip database'
-        working-directory: ${{ GITHUB.WORKSPACE }}/v0
+        working-directory: ${{ github.workspace }}/v0
         run: |
           rm -f pkg/geoip/geoip.db
           wget --tries=50 -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
@@ -161,12 +161,17 @@ jobs:
         with:
           images: ${{ env.DOCKER_USERNAME }}/nezha-dashboard
           tags: type=raw,value=${{ matrix.NEZHA_VERSION }}
+          labels: |
+            org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
+            org.opencontainers.image.source=https://github.com/nezhahq/nezha
+            org.opencontainers.image.title=Nezha
+            org.opencontainers.image.url=https://nezha.wiki
 
       - name: 'Build and Push nezha-dashboard image'
         uses: docker/build-push-action@v6
         with:
-          context: ${{ GITHUB.WORKSPACE }}/v0
-          file: ${{ GITHUB.WORKSPACE }}/v0/Dockerfile
+          context: ${{ github.workspace }}/v0
+          file: ${{ github.workspace }}/v0/Dockerfile
           platforms: linux/amd64, linux/arm64/v8
           build-args: NEZHA_VERSION=${{ matrix.NEZHA_VERSION }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -187,10 +192,10 @@ jobs:
         id: bump_version
         run: |
           NEZHA_VERSION="$(wget -qO- --tries=50 --header="Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/nezhahq/nezha/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')"
-          echo "version=${NEZHA_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "nezha_version=${NEZHA_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: 'Fetch ipinfo geoip database'
-        working-directory: ${{ GITHUB.WORKSPACE }}/v1
+        working-directory: ${{ github.workspace }}/v1
         run: |
           rm -f pkg/geoip/geoip.db
           wget --tries=50 -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
@@ -212,15 +217,20 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.DOCKER_USERNAME }}/nezha-dashboard
-          tags: type=raw,value=${{ steps.bump_version.outputs.version }}
+          tags: type=raw,value=${{ steps.bump_version.outputs.nezha_version }}
+          labels: |
+            org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
+            org.opencontainers.image.source=https://github.com/nezhahq/nezha
+            org.opencontainers.image.title=Nezha
+            org.opencontainers.image.url=https://nezha.wiki
 
       - name: 'Build and Push nezha-dashboard image'
         uses: docker/build-push-action@v6
         with:
-          context: ${{ GITHUB.WORKSPACE }}/v1
-          file: ${{ GITHUB.WORKSPACE }}/v1/Dockerfile
+          context: ${{ github.workspace }}/v1
+          file: ${{ github.workspace }}/v1/Dockerfile
           platforms: linux/amd64, linux/arm64/v8
-          build-args: NEZHA_VERSION=${{ steps.bump_version.outputs.version }}
+          build-args: NEZHA_VERSION=${{ steps.bump_version.outputs.nezha_version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: true
