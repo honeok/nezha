@@ -34,11 +34,11 @@ docker pull honeok/nezha-dashboard
 
 ## Screenshots (from v0)
 
-| Default Theme                                                                                                                                     | DayNight [@JackieSung](https://github.com/JackieSung4ev)                                                                 | hotaru                                                                                          |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| ![Default Theme](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-default/screenshot.png)                                    | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-daynight/screenshot.png" width="3000px"/> | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-hotaru/screenshot.png" width="1500px" /> |
-| <div align="center"><b>Neko Mdui <a href="https://github.com/MikoyChinese">@MikoyChinese</a></b></div>                                           | <div align="center"><b>AngelKanade <a href="https://github.com/adminsama">@adminsama</a></b></div>                       | <div align="center"><b>ServerStatus <a href="https://github.com/unclezs">@unclezs</a></b></div> |
-| ![Neko Mdui](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-mdui/screenshot.png)                                          | ![AngelKanade](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-angel-kanade/screenshot.png)         | ![默认主题魔改](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-server-status/screenshot.png)        |
+| Default Theme | DayNight [@JackieSung](https://github.com/JackieSung4ev) | hotaru |
+| :-----------: | :------------------------------------------------------: | :----: |
+| ![Default Theme](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-default/screenshot.png) | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-daynight/screenshot.png" width="3000px"/> | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-hotaru/screenshot.png" width="1500px" /> |
+| **Neko Mdui [@MikoyChinese](https://github.com/MikoyChinese)** | **AngelKanade [@adminsama](https://github.com/adminsama)** | **ServerStatus [@unclezs](https://github.com/unclezs)** |
+| ![Neko Mdui](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-mdui/screenshot.png) | ![AngelKanade](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-angel-kanade/screenshot.png) | ![默认主题魔改](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-server-status/screenshot.png) |
 
 ## Acknowledgements
 
