@@ -10,7 +10,7 @@
 
 <div align="center">
   <img src="https://img.shields.io/github/license/honeok/nezha.svg?style=flat-square&logo=github" alt="License">
-  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build.yml?style=flat-square&branch=master&logo=github" alt="Build Status" />
+  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build.yaml?style=flat-square&branch=master&logo=github" alt="Build Status" />
   <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square&logo=docker" alt="Docker Pulls" />
   <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?style=flat-square&logo=docker" alt="Docker Image Size" />
   <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?style=flat-square&logo=docker" alt="Docker Image Version" />

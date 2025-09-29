@@ -5,6 +5,9 @@
 name: 'GitHub Actions Mirror'
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
