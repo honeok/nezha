@@ -9,10 +9,11 @@
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build.yml?branch=master&logo=github&style=flat-square" alt="Build Status" />
-  <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square" alt="Docker Pulls" />
-  <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?style=flat-square" alt="Docker Image Size" />
-  <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?style=flat-square" alt="Docker Image Version" />
+  <img src="https://img.shields.io/github/license/honeok/nezha.svg?style=flat-square&logo=github" alt="License">
+  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build.yml?style=flat-square&branch=master&logo=github" alt="Build Status" />
+  <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square&logo=docker" alt="Docker Pulls" />
+  <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?style=flat-square&logo=docker" alt="Docker Image Size" />
+  <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?style=flat-square&logo=docker" alt="Docker Image Version" />
 </div>
 
 ## Purpose
@@ -25,15 +26,19 @@ This repository builds both `v0` and `v1` versions, ensuring the GeoIP database 
 
 ## Pull the image
 
+It can be found at [Docker Hub][1] and view the build records on [GitHub][2].
+
 ```shell
 docker pull honeok/nezha-dashboard
 ```
 
-It can be found at [Docker Hub][1] and view the build records on [GitHub][2].
+## Screenshots (from v0)
 
-## Special Thanks
-
-- [IPInfo][3] for providing an accurate GeoIP Database.
+| Default Theme                                                                                                                                     | DayNight [@JackieSung](https://github.com/JackieSung4ev)                                                                 | hotaru                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| ![Default Theme](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-default/screenshot.png)                                    | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-daynight/screenshot.png" width="3000px"/> | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-hotaru/screenshot.png" width="1500px" /> |
+| <div align="center"><b>Neko Mdui <a href="https://github.com/MikoyChinese">@MikoyChinese</a></b></div>                                           | <div align="center"><b>AngelKanade <a href="https://github.com/adminsama">@adminsama</a></b></div>                       | <div align="center"><b>ServerStatus <a href="https://github.com/unclezs">@unclezs</a></b></div> |
+| ![Neko Mdui](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-mdui/screenshot.png)                                          | ![AngelKanade](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-angel-kanade/screenshot.png)         | ![默认主题魔改](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-server-status/screenshot.png)        |
 
 ## Acknowledgements
 
@@ -101,6 +106,10 @@ All developers of the Nezha Probe project.
 <a href="https://github.com/Es-dese" title="Esdese"><img src="https://avatars.githubusercontent.com/u/71542548?v=4" width="50;" alt="Esdese"/></a>
 <a href="https://github.com/wwng2333" title=":D"><img src="https://avatars.githubusercontent.com/u/17147265?v=4" width="50;" alt=":D"/></a>
 <a href="https://github.com/wellcoming" title="Coming"><img src="https://avatars.githubusercontent.com/u/74850890?v=4" width="50;" alt="Coming"/></a><!--GAMFC_DELIMITER_END-->
+
+## Special Thanks
+
+- [IPInfo][3] for providing an accurate GeoIP Database.
 
 [1]: https://hub.docker.com/r/honeok/nezha-dashboard
 [2]: https://github.com/honeok/nezha
