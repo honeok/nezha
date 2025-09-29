@@ -27,15 +27,15 @@ env:
 
 jobs:
   release_v0:
-    name: 'Release ${{ matrix.NEZHA_VERSION }} binary'
+    name: 'Release ${{ matrix.nezha_version }} binary'
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: true
       matrix:
-        NEZHA_VERSION:
-          - 'v0.18.6'
-          - 'v0.20.13'
+        nezha_version:
+          - v0.18.6
+          - v0.20.13
 
     steps:
       - name: 'checkout repository'
@@ -45,15 +45,15 @@ jobs:
 
       - name: 'Check and remove existing tag'
         run: |
-          if git tag --list | grep -q "^${{ matrix.NEZHA_VERSION }}$"; then
-            git push origin --delete ${{ matrix.NEZHA_VERSION }}
+          if git tag --list | grep -q "^${{ matrix.nezha_version }}$"; then
+            git push origin --delete ${{ matrix.nezha_version }}
           fi
 
-      - name: 'Clone source code for ${{ matrix.NEZHA_VERSION }}'
+      - name: 'Clone source code for ${{ matrix.nezha_version }}'
         run: |
           mkdir -p ${{ github.workspace }}/v0/source
           cd ${{ github.workspace }}/v0/source
-          git clone --depth=1 --branch ${{ matrix.NEZHA_VERSION }} https://github.com/nezhahq/nezha.git .
+          git clone --depth=1 --branch ${{ matrix.nezha_version }} https://github.com/nezhahq/nezha.git .
 
       - name: 'Replace static resources'
         working-directory: ${{ github.workspace }}/v0/source
@@ -66,13 +66,12 @@ jobs:
         working-directory: ${{ github.workspace }}/v0/source
         run: |
           rm -f pkg/geoip/geoip.db
-          wget --tries=50 -qO pkg/geoip/geoip.db "https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}"
+          wget --tries=50 -qO pkg/geoip/geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
 
       - name: 'Extract version number'
         id: bump_version
-        run: echo "nezha_version=$(sed 's/^v//' <<< ${{ matrix.NEZHA_VERSION }})" >> "$GITHUB_OUTPUT"
+        run: echo "nezha_version=$(sed 's/^v//' <<< ${{ matrix.nezha_version }})" >> "$GITHUB_OUTPUT"
 
-      # https://github.com/crazy-max/ghaction-xgo?tab=readme-ov-file#usage
       - name: 'Build release binaries'
         uses: crazy-max/ghaction-xgo@v3
         with:
@@ -111,32 +110,31 @@ jobs:
 
       - name: 'Fetch build time'
         id: build_time
-        run:  echo "time=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
+        run: echo "build_time=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
 
-      # https://github.com/ncipollo/release-action/blob/main/README.zh-Hans.md
       - name: 'Create release and upload release'
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
           artifacts: ${{ github.workspace }}/v0/source/build/*.tar.gz
           body: |
-            Automated release of nezha-dashboard version ${{ matrix.NEZHA_VERSION }}.
+            Automated release of nezha-dashboard version ${{ matrix.nezha_version }}.
             Binaries are built from official repositories.
-            Release time: ${{ steps.build_time.outputs.time }}
+            Release time: ${{ steps.build_time.outputs.build_time }}
           generateReleaseNotes: false
-          name: ${{ matrix.NEZHA_VERSION }}
-          tag: ${{ matrix.NEZHA_VERSION }}
+          name: ${{ matrix.nezha_version }}
+          tag: ${{ matrix.nezha_version }}
 
   build_v0:
-    name: 'Build ${{ matrix.NEZHA_VERSION }} image'
+    name: 'Build ${{ matrix.nezha_version }} image'
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: true
       matrix:
-        NEZHA_VERSION:
-          - 'v0.18.6'
-          - 'v0.20.13'
+        nezha_version:
+          - v0.18.6
+          - v0.20.13
 
     steps:
       - name: 'Check out repository'
@@ -146,9 +144,7 @@ jobs:
 
       - name: 'Fetch ipinfo geoip database'
         working-directory: ${{ github.workspace }}/v0
-        run: |
-          rm -f pkg/geoip/geoip.db
-          wget --tries=50 -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
+        run: wget --tries=50 -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
 
       - name: 'Set up Docker QEMU'
         uses: docker/setup-qemu-action@v3
@@ -167,7 +163,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.DOCKER_USERNAME }}/nezha-dashboard
-          tags: type=raw,value=${{ matrix.NEZHA_VERSION }}
+          tags: type=raw,value=${{ matrix.nezha_version }}
           labels: |
             org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
             org.opencontainers.image.source=https://github.com/nezhahq/nezha
@@ -180,10 +176,10 @@ jobs:
           context: ${{ github.workspace }}/v0
           file: ${{ github.workspace }}/v0/Dockerfile
           platforms: linux/amd64, linux/arm64/v8
-          build-args: NEZHA_VERSION=${{ matrix.NEZHA_VERSION }}
+          build-args: NEZHA_VERSION=${{ matrix.nezha_version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
 
   build_v1:
     name: 'Build v1 image'
@@ -198,14 +194,12 @@ jobs:
       - name: 'Fetch Versions and Determine Build'
         id: bump_version
         run: |
-          NEZHA_VERSION="$(wget -qO- --tries=50 --header="Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/nezhahq/nezha/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')"
+          NEZHA_VERSION="$(wget -qO- --tries=50 --header="Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/nezhahq/nezha/releases/latest | grep '"tag_name":' | sed -n 's/.*"tag_name": "\(v[0-9.]*\)".*/\1/p')"
           echo "nezha_version=${NEZHA_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: 'Fetch ipinfo geoip database'
         working-directory: ${{ github.workspace }}/v1
-        run: |
-          rm -f pkg/geoip/geoip.db
-          wget --tries=50 -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
+        run: wget --tries=50 -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
 
       - name: 'Set up Docker QEMU'
         uses: docker/setup-qemu-action@v3
@@ -240,15 +234,15 @@ jobs:
           build-args: NEZHA_VERSION=${{ steps.bump_version.outputs.nezha_version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
 
-  cleaning_workflow:
+  clean:
     name: 'Cleaning up old workflows'
+    runs-on: ubuntu-latest
     needs:
       - release_v0
       - build_v0
       - build_v1
-    runs-on: ubuntu-latest
 
     steps:
       - name: 'Cleaning up old workflows'
@@ -259,3 +253,24 @@ jobs:
           retain_days: 0
           keep_minimum_runs: 0
           delete_run_by_conclusion_pattern: "cancelled, skipped, success"
+
+  sync:
+    name: 'Sync README to dockerhub'
+    runs-on: ubuntu-latest
+    needs:
+      - clean
+
+    steps:
+      - name: 'Check out repository'
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: 'Sync README to dockerhub'
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+          repository: ${{ env.DOCKER_USERNAME }}/nezha-dashboard
+          readme-filepath: ./README.md
+          enable-url-completion: false

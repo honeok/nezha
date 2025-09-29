@@ -1,10 +1,10 @@
+# Copyright (c) 2025 honeok <i@honeok.com>
+# SPDX-License-Identifier: Apache-2.0
+
 ---
 name: 'GitHub Actions Mirror'
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
