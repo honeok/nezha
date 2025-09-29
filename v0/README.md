@@ -10,8 +10,8 @@
 - `--skip-conn`：不监控网络连接数。建议在连接数较多或 CPU 资源占用较高的服务器上使用此参数。
 - `--skip-procs`：不监控进程数，有助于降低 Agent 的资源占用。
 - `--disable-auto-update`：禁用 Agent 的**自动更新**功能，增强安全性。
-- `--disable-force-update`：：禁用 Agent 的**强制更新**功能，增强安全性。
-- `--disable-command-execute`：：禁止在 Agent 上执行任何定时任务或使用在线终端，增强安全性。
+- `--disable-force-update`：禁用 Agent 的**强制更新**功能，增强安全性。
+- `--disable-command-execute`：禁止在 Agent 上执行任何定时任务或使用在线终端，增强安全性。
 - `--tls`：启用 SSL/TLS 加密。当您使用 nginx 反向代理 Agent 的 gRPC 连接且 nginx 配置了 SSL/TLS 时，应启用此配置。
 - `--use-ipv6-countrycode`：强制使用 IPv6 地址查询国家代码。默认情况下，Agent 使用 IPv4 地址查询国家代码，如果服务器支持 IPv6 且与 IPv4 地址的国家代码不同，可以使用此参数。
 - `--gpu`：启用 GPU 监控。注意：GPU 使用率监控可能需要安装额外的依赖包，详细信息可以参考文档。
