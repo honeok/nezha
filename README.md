@@ -9,11 +9,12 @@
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/github/license/honeok/nezha.svg?style=flat-square&logo=github" alt="License">
-  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build.yaml?style=flat-square&branch=master&logo=github" alt="Build Status" />
-  <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square&logo=docker" alt="Docker Pulls" />
-  <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?style=flat-square&logo=docker" alt="Docker Image Size" />
-  <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?style=flat-square&logo=docker" alt="Docker Image Version" />
+  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build.yaml?style=flat-square&branch=master&logo=github" alt="Build Status"/>
+  <img src="https://img.shields.io/github/v/tag/honeok/nezha.svg?style=flat-square&label=release&logo=github&color=blue" alt="GitHub Release"/>
+  <img src="https://img.shields.io/github/license/honeok/nezha.svg?style=flat-square&logo=github" alt="License"/>
+  <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Pulls"/>
+  <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Size"/>
+  <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Version"/>
 </div>
 
 ## Purpose
@@ -39,6 +40,13 @@ docker pull honeok/nezha-dashboard
 | ![Default Theme](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-default/screenshot.png) | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-daynight/screenshot.png" width="3000px"/> | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-hotaru/screenshot.png" width="1500px" /> |
 | **Neko Mdui [@MikoyChinese](https://github.com/MikoyChinese)** | **AngelKanade [@adminsama](https://github.com/adminsama)** | **ServerStatus [@unclezs](https://github.com/unclezs)** |
 | ![Neko Mdui](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-mdui/screenshot.png) | ![AngelKanade](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-angel-kanade/screenshot.png) | ![默认主题魔改](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-server-status/screenshot.png) |
+
+## Screenshots (from v1)
+
+| 用户前台 [@hamster1963](https://github.com/hamster1963) | 管理后台 [@nezhahq](https://github.com/nezhahq) |
+| :-----------------------------------------------------: | :---------------------------------------------: |
+| ![user](https://github.com/nezhahq/nezha/raw/master/.github/user-frontend.20241128.png) | ![admin](https://github.com/nezhahq/nezha/raw/master/.github/admin-frontend.20241220.jpg) |
+| [hamster1963/nezha-dash](https://github.com/hamster1963/nezha-dash) | [nezhahq/admin-frontend](https://github.com/nezhahq/admin-frontend) |
 
 ## Acknowledgements
 
