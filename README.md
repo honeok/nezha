@@ -41,6 +41,13 @@ docker pull honeok/nezha-dashboard
 | **Neko Mdui [@MikoyChinese](https://github.com/MikoyChinese)** | **AngelKanade [@adminsama](https://github.com/adminsama)** | **ServerStatus [@unclezs](https://github.com/unclezs)** |
 | ![Neko Mdui](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-mdui/screenshot.png) | ![AngelKanade](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-angel-kanade/screenshot.png) | ![默认主题魔改](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-server-status/screenshot.png) |
 
+## Screenshots (from v1)
+
+| 用户前台 [@hamster1963](https://github.com/hamster1963) | 管理后台 [@nezhahq](https://github.com/nezhahq) |
+| :-----------------------------------------------------: | :---------------------------------------------: |
+| ![user](https://github.com/nezhahq/nezha/raw/master/.github/user-frontend.20241128.png) | ![admin](https://github.com/nezhahq/nezha/raw/master/.github/admin-frontend.20241220.jpg) |
+| [hamster1963/nezha-dash](https://github.com/hamster1963/nezha-dash) | [nezhahq/admin-frontend](https://github.com/nezhahq/admin-frontend) |
+
 ## Acknowledgements
 
 All developers of the Nezha Probe project.
