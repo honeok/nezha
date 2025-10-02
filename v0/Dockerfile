@@ -1,15 +1,17 @@
 # Description: This dockerfile is used to build nezha dashboard v0 with the new geoip database to fix the correct national flag display.
 #
 # Copyright (c) 2025 honeok <i@honeok.com>
+# SPDX-License-Identifier: Apache-2.0
 #
 # References:
 # https://github.com/naiba/nezha
-#
-# SPDX-License-Identifier: Apache-2.0
 
-ARG NEZHA_VERSION=""
+FROM alpine:latest AS certs
+LABEL maintainer="honeok <i@honeok.com>"
+RUN set -ex \
+    && apk add --update --no-cache ca-certificates
 
-FROM golang:1.21-alpine AS builder
+FROM golang:1.25-alpine AS builder
 LABEL maintainer="honeok <i@honeok.com>"
 ARG NEZHA_VERSION=""
 WORKDIR /go/src/github.com/naiba/nezha
@@ -24,11 +26,21 @@ RUN set -ex \
     && chmod +x build.sh && ./build.sh \
     && go mod tidy -v \
     && go build -v -trimpath -ldflags="\
-        -s -w -buildid= \
-        -extldflags '-static -fpic' \
-        -X 'github.com/naiba/nezha/service/singleton.Version=${NEZHA_VERSION#v}' \
-        " -o /go/bin/dashboard ./cmd/dashboard
+    -s -w -buildid= \
+    -extldflags '-static -fpic' \
+    -X 'github.com/naiba/nezha/service/singleton.Version=${NEZHA_VERSION#v}' \
+    " -o /go/bin/dashboard ./cmd/dashboard
 
-FROM ghcr.io/naiba/nezha-dashboard:${NEZHA_VERSION} AS dist
+FROM busybox:stable-musl AS dist
 LABEL maintainer="honeok <i@honeok.com>"
+ARG TZ=Asia/Shanghai
+COPY --from=certs /etc/ssl/certs /etc/ssl/certs
 COPY --from=builder /go/bin/dashboard /dashboard/app
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN set -ex \
+    && chmod +x /docker-entrypoint.sh
+WORKDIR /dashboard
+ENV TZ=$TZ
+VOLUME ["/dashboard/data"]
+EXPOSE 80 5555
+ENTRYPOINT ["/docker-entrypoint.sh"]
