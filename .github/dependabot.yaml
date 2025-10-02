@@ -1,11 +1,19 @@
-# Copyright (c) 2025 honeok <i@honeok.com>
-# SPDX-License-Identifier: Apache-2.0
-
 ---
 version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "16:00"
+    target-branch: "release"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+
+  - package-ecosystem: "docker"
+    directory: "/v0"
     schedule:
       interval: "weekly"
       day: "saturday"

@@ -9,12 +9,24 @@
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build.yaml?style=flat-square&branch=master&logo=github" alt="Build Status"/>
-  <img src="https://img.shields.io/github/v/tag/honeok/nezha.svg?style=flat-square&label=release&logo=github&color=blue" alt="GitHub Release"/>
-  <img src="https://img.shields.io/github/license/honeok/nezha.svg?style=flat-square&logo=github" alt="License"/>
-  <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Pulls"/>
-  <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Size"/>
-  <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Version"/>
+  <a href="https://github.com/honeok/nezha">
+    <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build.yaml?style=flat-square&branch=master&logo=github" alt="Build Status" />
+  </a>
+  <a href="https://github.com/honeok/nezha/releases">
+    <img src="https://img.shields.io/github/v/tag/honeok/nezha.svg?style=flat-square&label=release&logo=github&color=blue" alt="GitHub Release" />
+  </a>
+  <a href="https://github.com/honeok/nezha">
+    <img src="https://img.shields.io/github/license/honeok/nezha.svg?style=flat-square&logo=github" alt="License" />
+  </a>
+  <a href="https://github.com/honeok/nezha">
+    <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Pulls" />
+  </a>
+  <a href="https://github.com/honeok/nezha">
+    <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Size" />
+  </a>
+  <a href="https://github.com/honeok/nezha">
+    <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Version" />
+  </a>
 </div>
 
 ## Purpose
