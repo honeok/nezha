@@ -6,10 +6,10 @@
 # References:
 # https://github.com/nezhahq/nezha
 
-FROM alpine:latest AS certs
+FROM alpine:latest AS depend
 LABEL maintainer="honeok <i@honeok.com>"
 RUN set -ex \
-    && apk add --update --no-cache ca-certificates
+    && apk add --update --no-cache ca-certificates tzdata
 
 FROM golang:1.25-alpine AS builder
 LABEL maintainer="honeok <i@honeok.com>"
@@ -37,7 +37,8 @@ FROM busybox:stable-musl AS dist
 LABEL maintainer="honeok <i@honeok.com>"
 ARG TZ=Asia/Shanghai
 WORKDIR /dashboard
-COPY --from=certs /etc/ssl/certs /etc/ssl/certs
+COPY --from=depend /etc/ssl/certs /etc/ssl/certs
+COPY --from=depend /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /go/bin/dashboard /dashboard/app
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN set -ex \
