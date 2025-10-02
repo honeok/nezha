@@ -36,12 +36,12 @@ RUN set -ex \
 FROM busybox:stable-musl AS dist
 LABEL maintainer="honeok <i@honeok.com>"
 ARG TZ=Asia/Shanghai
+WORKDIR /dashboard
 COPY --from=certs /etc/ssl/certs /etc/ssl/certs
 COPY --from=builder /go/bin/dashboard /dashboard/app
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN set -ex \
     && chmod +x /docker-entrypoint.sh
-WORKDIR /dashboard
 ENV TZ=$TZ
 VOLUME ["/dashboard/data"]
 EXPOSE 8008
