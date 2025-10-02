@@ -18,13 +18,13 @@
   <a href="https://github.com/honeok/nezha">
     <img src="https://img.shields.io/github/license/honeok/nezha.svg?style=flat-square&logo=github" alt="License" />
   </a>
-  <a href="https://github.com/honeok/nezha">
+  <a href="https://hub.docker.com/r/honeok/nezha-dashboard">
     <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Pulls" />
   </a>
-  <a href="https://github.com/honeok/nezha">
+  <a href="https://hub.docker.com/r/honeok/nezha-dashboard">
     <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Size" />
   </a>
-  <a href="https://github.com/honeok/nezha">
+  <a href="https://hub.docker.com/r/honeok/nezha-dashboard">
     <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Version" />
   </a>
 </div>
