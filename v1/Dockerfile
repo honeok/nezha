@@ -6,7 +6,10 @@
 # References:
 # https://github.com/nezhahq/nezha
 
-ARG NEZHA_VERSION=""
+FROM alpine:latest AS certs
+LABEL maintainer="honeok <i@honeok.com>"
+RUN set -ex \
+    && apk add --update --no-cache ca-certificates
 
 FROM golang:1.25-alpine AS builder
 LABEL maintainer="honeok <i@honeok.com>"
@@ -30,6 +33,16 @@ RUN set -ex \
     -X 'github.com/nezhahq/nezha/service/singleton.Version=${NEZHA_VERSION#v}' \
     " -o /go/bin/dashboard ./cmd/dashboard
 
-FROM ghcr.io/nezhahq/nezha:${NEZHA_VERSION} AS dist
+FROM busybox:stable-musl AS dist
 LABEL maintainer="honeok <i@honeok.com>"
+ARG TZ=Asia/Shanghai
+COPY --from=certs /etc/ssl/certs /etc/ssl/certs
 COPY --from=builder /go/bin/dashboard /dashboard/app
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN set -ex \
+    && chmod +x /docker-entrypoint.sh
+WORKDIR /dashboard
+ENV TZ=$TZ
+VOLUME ["/dashboard/data"]
+EXPOSE 8008
+ENTRYPOINT ["/docker-entrypoint.sh"]
