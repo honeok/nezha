@@ -1,0 +1,45 @@
+---
+name: 'Sync contributors'
+
+on:
+  schedule:
+    - cron: '0 16 * * 6'
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: 'Sync contributors'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Check out repository'
+        uses: actions/checkout@v5
+        with:
+          ref: release
+          fetch-depth: 0
+
+      - name: 'Comparing contributors'
+        run: |
+          OFFICIAL="$(wget -qO- https://github.com/nezhahq/nezha/raw/master/README.md | sed -n '/<!--GAMFC_DELIMITER-->/,/<!--GAMFC_DELIMITER_END-->/p')"
+          LOCAL="$(sed -n '/<!--GAMFC_DELIMITER-->/,/<!--GAMFC_DELIMITER_END-->/p' ./README.md)"
+          if [ "$OFFICIAL" != "$LOCAL" ]; then
+            printf '%s\n' "$OFFICIAL" | sed -i '/<!--GAMFC_DELIMITER-->/,/<!--GAMFC_DELIMITER_END-->/{
+              /<!--GAMFC_DELIMITER-->/r /dev/stdin
+              /<!--GAMFC_DELIMITER-->/,/<!--GAMFC_DELIMITER_END-->/d
+            }' ./README.md
+            echo "IS_RENEW=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: 'Upload commit to repository'
+        uses: stefanzweifel/git-auto-commit-action@v6
+        if: env.IS_RENEW == 1
+        with:
+          commit_message: "chore: sync contributors by github actions"
+          branch: release
