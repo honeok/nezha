@@ -18,7 +18,7 @@ WORKDIR /go/src/github.com/naiba/nezha
 ENV CGO_ENABLED=1
 ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE=1"
 RUN set -ex \
-    && apk add --update --no-cache git gcc musl-dev \
+    && apk add --update --no-cache bash git gcc musl-dev \
     && git clone --depth=1 --branch ${NEZHA_VERSION} https://github.com/nezhahq/nezha.git .
 COPY geoip.db pkg/geoip/geoip.db
 COPY build.sh .
