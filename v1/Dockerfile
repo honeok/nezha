@@ -6,7 +6,7 @@
 # References:
 # https://github.com/nezhahq/nezha
 
-FROM alpine:latest AS depend
+FROM alpine:latest AS deps
 LABEL maintainer="honeok <i@honeok.com>"
 RUN set -ex \
     && apk add --update --no-cache ca-certificates tzdata
@@ -37,10 +37,10 @@ FROM busybox:stable-musl AS dist
 LABEL maintainer="honeok <i@honeok.com>"
 ARG TZ=Asia/Shanghai
 WORKDIR /dashboard
-COPY --from=depend /etc/ssl/certs /etc/ssl/certs
-COPY --from=depend /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=deps /etc/ssl/certs /etc/ssl/certs
+COPY --from=deps /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /go/bin/dashboard /dashboard/app
-COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY docker-entrypoint.sh /
 RUN set -ex \
     && chmod +x /docker-entrypoint.sh
 ENV TZ=$TZ
