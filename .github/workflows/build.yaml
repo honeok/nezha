@@ -1,6 +1,3 @@
-# Copyright (c) 2025 honeok <i@honeok.com>
-# SPDX-License-Identifier: Apache-2.0
-
 ---
 name: 'Build nezha-dashboard'
 
@@ -11,10 +8,6 @@ on:
   schedule:
     - cron: '0 16 1 * *'
   workflow_dispatch:
-
-permissions:
-  actions: write
-  contents: write
 
 defaults:
   run:
@@ -66,17 +59,27 @@ jobs:
         working-directory: ${{ github.workspace }}/v0/source
         run: |
           rm -f pkg/geoip/geoip.db
-          wget --tries=50 -qO pkg/geoip/geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
+          wget --tries=50 --no-check-certificate -qO pkg/geoip/geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
 
       - name: 'Extract version number'
         id: bump_version
         run: echo "nezha_version=$(sed 's/^v//' <<< ${{ matrix.nezha_version }})" >> "$GITHUB_OUTPUT"
 
+      - name: 'Setup xgo go version'
+        id: setup_go
+        run: |
+          GO_VERSION="$(wget --tries=50 --no-check-certificate -qO- https://go.dev/dl/?mode=json | awk '/version/ {print $2}' | sed -n '1s/.*"go\([0-9]*\.[0-9]*\).*/\1/p')"
+          echo "go_version=$GO_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: 'Fetch build time'
+        id: build_time
+        run: echo "build_time=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
+
       - name: 'Build release binaries'
         uses: crazy-max/ghaction-xgo@v3
         with:
           xgo_version: latest
-          go_version: 1.21
+          go_version: ${{ steps.setup_go.outputs.go_version }}
           dest: build
           pkg: cmd/dashboard
           prefix: dashboard
@@ -107,10 +110,6 @@ jobs:
             fi
           done
           cd ..
-
-      - name: 'Fetch build time'
-        id: build_time
-        run: echo "build_time=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
 
       - name: 'Create release and upload release'
         uses: ncipollo/release-action@v1
@@ -144,7 +143,7 @@ jobs:
 
       - name: 'Fetch ipinfo geoip database'
         working-directory: ${{ github.workspace }}/v0
-        run: wget --tries=50 -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
+        run: wget --tries=50 --no-check-certificate -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
 
       - name: 'Set up Docker QEMU'
         uses: docker/setup-qemu-action@v3
@@ -199,7 +198,7 @@ jobs:
 
       - name: 'Fetch ipinfo geoip database'
         working-directory: ${{ github.workspace }}/v1
-        run: wget --tries=50 -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
+        run: wget --tries=50 --no-check-certificate -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
 
       - name: 'Set up Docker QEMU'
         uses: docker/setup-qemu-action@v3
@@ -236,8 +235,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}
 
-  clean:
-    name: 'Cleaning up old workflows'
+  sync:
+    name: 'Sync readme to dockerhub'
     runs-on: ubuntu-latest
     needs:
       - release_v0
@@ -245,28 +244,12 @@ jobs:
       - build_v1
 
     steps:
-      - name: 'Cleaning up old workflows'
-        uses: Mattraks/delete-workflow-runs@v2
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          retain_days: 0
-          keep_minimum_runs: 0
-          delete_run_by_conclusion_pattern: "cancelled, skipped, success"
-
-  sync:
-    name: 'Sync README to dockerhub'
-    runs-on: ubuntu-latest
-    needs:
-      - clean
-
-    steps:
       - name: 'Check out repository'
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: 'Sync README to dockerhub'
+      - name: 'Sync readme to dockerhub'
         uses: peter-evans/dockerhub-description@v5
         with:
           username: ${{ env.DOCKER_USERNAME }}
