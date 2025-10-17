@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 #
 # Description: This script is used to replace the unpkg and bytedance static resource public library address.
 #
 # Copyright (c) 2025 honeok <i@honeok.com>
-# SPDX-License-Identifier: Apache-2.0
 
 set -eEux
 
@@ -29,6 +29,12 @@ sed -i 's#https://unpkg.com/xterm@5.3.0/lib/xterm.js#https://registry.npmmirror.
 sed -i 's#https://unpkg.com/@xterm/addon-fit@0.10.0/lib/addon-fit.js#https://registry.npmmirror.com/@xterm/addon-fit/0.10.0/files/lib/addon-fit.js#g' resource/template/dashboard-default/terminal.html
 sed -i 's#https://unpkg.com/@xterm/addon-web-links@0.11.0/lib/addon-web-links.js#https://registry.npmmirror.com/@xterm/addon-web-links/0.11.0/files/lib/addon-web-links.js#g' resource/template/dashboard-default/terminal.html
 sed -i 's#https://unpkg.com/@xterm/addon-attach@0.11.0/lib/addon-attach.js#https://registry.npmmirror.com/@xterm/addon-attach/0.11.0/files/lib/addon-attach.js#g' resource/template/dashboard-default/terminal.html
+
+# sed -i 's#https://unpkg.com/xterm@5.3.0/css/xterm.css#https://testingcf.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css#g' resource/template/dashboard-default/terminal.html
+# sed -i 's#https://unpkg.com/xterm@5.3.0/lib/xterm.js#https://testingcf.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js#g' resource/template/dashboard-default/terminal.html
+# sed -i 's#https://unpkg.com/@xterm/addon-fit@0.10.0/lib/addon-fit.js#https://testingcf.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.js#g' resource/template/dashboard-default/terminal.html
+# sed -i 's#https://unpkg.com/@xterm/addon-web-links@0.11.0/lib/addon-web-links.js#https://testingcf.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.js#g' resource/template/dashboard-default/terminal.html
+# sed -i 's#https://unpkg.com/@xterm/addon-attach@0.11.0/lib/addon-attach.js#https://testingcf.jsdelivr.net/npm/@xterm/addon-attach@0.11.0/lib/addon-attach.js#g' resource/template/dashboard-default/terminal.html
 
 # theme-angel-kanade
 sed -i 's#https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.6.0/jquery.min.js#https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js#g' resource/template/theme-angel-kanade/footer.html
