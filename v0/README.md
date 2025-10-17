@@ -39,7 +39,7 @@ esac \
 && unzip -o "nezha-agent_linux_$SYS_ARCH.zip" -d /opt/nezha/agent \
 && rm -f nezha-agent* \
 && systemctl daemon-reload \
-&& systemctl restart nezha-agent
+&& systemctl restart nezha-agent.service
 ```
 
 ## 致谢
