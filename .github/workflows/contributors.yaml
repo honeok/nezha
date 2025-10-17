@@ -43,4 +43,7 @@ jobs:
         with:
           commit_message: "docs: sync contributors by github actions"
           branch: release
-          commit_options: "--no-verify --signoff"
+          commit_options: "--signoff --no-verify"
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
