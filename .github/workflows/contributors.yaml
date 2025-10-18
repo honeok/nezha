@@ -1,9 +1,9 @@
 ---
-name: 'Sync contributors'
+name: "Sync contributors"
 
 on:
   schedule:
-    - cron: '0 16 * * 6'
+    - cron: "0 16 * * 6"
   workflow_dispatch:
 
 defaults:
@@ -15,17 +15,17 @@ permissions:
 
 jobs:
   sync:
-    name: 'Sync contributors'
+    name: "Sync contributors"
     runs-on: ubuntu-latest
 
     steps:
-      - name: 'Check out repository'
+      - name: "Check out repository"
         uses: actions/checkout@v5
         with:
           ref: release
           fetch-depth: 0
 
-      - name: 'Comparing contributors'
+      - name: "Comparing contributors"
         run: |
           OFFICIAL="$(wget -qO- https://github.com/nezhahq/nezha/raw/master/README.md | sed -n '/<!--GAMFC_DELIMITER-->/,/<!--GAMFC_DELIMITER_END-->/p')"
           LOCAL="$(sed -n '/<!--GAMFC_DELIMITER-->/,/<!--GAMFC_DELIMITER_END-->/p' ./README.md)"
@@ -37,9 +37,13 @@ jobs:
             echo "IS_RENEW=1" >> "$GITHUB_ENV"
           fi
 
-      - name: 'Upload commit to repository'
-        uses: stefanzweifel/git-auto-commit-action@v6
+      - name: "Upload commit to repository"
+        uses: stefanzweifel/git-auto-commit-action@v7
         if: env.IS_RENEW == 1
         with:
           commit_message: "docs: sync contributors by github actions"
           branch: release
+          commit_options: "--signoff --no-verify"
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
