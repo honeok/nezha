@@ -9,6 +9,9 @@ on:
     - cron: "0 16 1 * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 defaults:
   run:
     shell: bash
