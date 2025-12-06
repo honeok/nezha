@@ -1,0 +1,95 @@
+---
+name: "Build v1"
+
+on:
+  schedule:
+    - cron: "0 16 * * *"
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  build:
+    name: "Build v1 image"
+    runs-on: ubuntu-latest
+    outputs:
+      pushed: ${{ steps.bump_version.outputs.build_image }}
+
+    steps:
+      - name: "Check out repository"
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: "Fetch Versions and Determine Build"
+        id: bump_version
+        run: |
+          LATEST_VER="$(wget -qO- --tries=50 --header="Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/nezhahq/nezha/releases/latest | grep '"tag_name":' | sed -n 's/.*"tag_name": "\(v[0-9.]*\)".*/\1/p')"
+          CURRENT_VER="$(wget -qO- --tries=50 https://hub.docker.com/v2/repositories/$DOCKER_USERNAME/nezha-dashboard/tags 2>/dev/null | grep -o '"name":"[^"]*"' | awk -F'"' '$4!="latest"{print $4}' | sort -rV | head -n1 || true)"
+          CURRENT_DAY="$(date -u '+%d' -d '+8 hours')"
+          echo "nezha_version=${LATEST_VER}" >> "$GITHUB_OUTPUT"
+          if [[ "$(printf '%s\n%s\n' "$LATEST_VER" "$CURRENT_VER" | sort -V | head -n1)" != "$LATEST_VER" || -z "$CURRENT_VER" && -n "$LATEST_VER" || "$CURRENT_DAY" == "01" ]]; then
+            echo "build_image=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: "Fetch ipinfo geoip database"
+        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
+        working-directory: ${{ github.workspace }}/v1
+        run: wget --tries=50 --no-check-certificate -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
+
+      - name: "Set up Docker QEMU"
+        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
+        uses: docker/setup-qemu-action@v3
+
+      - name: "Set up Docker Buildx"
+        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
+        uses: docker/setup-buildx-action@v3
+
+      - name: "Login to DockerHub"
+        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
+      - name: "Extract Docker metadata"
+        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_USERNAME }}/nezha-dashboard
+          tags: |
+            type=raw,value=${{ steps.bump_version.outputs.nezha_version }}
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
+            org.opencontainers.image.source=https://github.com/nezhahq/nezha
+            org.opencontainers.image.title=Nezha
+            org.opencontainers.image.url=https://nezha.wiki
+
+      - name: "Build and Push nezha-dashboard image"
+        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ github.workspace }}/v1
+          file: ${{ github.workspace }}/v1/Dockerfile
+          platforms: linux/amd64, linux/arm64
+          build-args: NEZHA_VERSION=${{ steps.bump_version.outputs.nezha_version }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: ${{ github.event_name != 'pull_request' }}
+
+  sync:
+    name: "Sync readme to dockerhub"
+    needs:
+      - build
+    if: needs.build.outputs.pushed == '1' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/sync-readme.yaml
+    secrets: inherit
