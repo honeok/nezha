@@ -9,7 +9,7 @@
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build.yaml?style=flat-square&branch=master&logo=github" alt="Build Status" />
+  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build-v0.yaml?style=flat-square&branch=master&logo=github" alt="Build Status" />
   <img src="https://img.shields.io/github/v/tag/honeok/nezha.svg?style=flat-square&label=release&logo=github&color=blue" alt="GitHub Release" />
   <img src="https://img.shields.io/github/license/honeok/nezha.svg?style=flat-square&logo=github" alt="License" />
   <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Pulls" />
@@ -35,23 +35,24 @@ docker pull honeok/nezha-dashboard
 
 ## Screenshots (from v0)
 
-| Default Theme | DayNight [@JackieSung](https://github.com/JackieSung4ev) | hotaru |
-| :-----------: | :------------------------------------------------------: | :----: |
+|                                                 Default Theme                                                  |                                 DayNight [@JackieSung](https://github.com/JackieSung4ev)                                  |                                                          hotaru                                                          |
+| :------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------: |
 | ![Default Theme](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-default/screenshot.png) | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-daynight/screenshot.png" width="3000px"/> | <img src="https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-hotaru/screenshot.png" width="1500px" /> |
-| **Neko Mdui [@MikoyChinese](https://github.com/MikoyChinese)** | **AngelKanade [@adminsama](https://github.com/adminsama)** | **ServerStatus [@unclezs](https://github.com/unclezs)** |
-| ![Neko Mdui](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-mdui/screenshot.png) | ![AngelKanade](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-angel-kanade/screenshot.png) | ![默认主题魔改](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-server-status/screenshot.png) |
+|                         **Neko Mdui [@MikoyChinese](https://github.com/MikoyChinese)**                         |                                **AngelKanade [@adminsama](https://github.com/adminsama)**                                 |                                 **ServerStatus [@unclezs](https://github.com/unclezs)**                                  |
+|    ![Neko Mdui](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-mdui/screenshot.png)     |     ![AngelKanade](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-angel-kanade/screenshot.png)     |   ![默认主题魔改](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-server-status/screenshot.png)    |
 
 ## Screenshots (from v1)
 
-| 用户前台 [@hamster1963](https://github.com/hamster1963) | 管理后台 [@nezhahq](https://github.com/nezhahq) |
-| :-----------------------------------------------------: | :---------------------------------------------: |
+|                 用户前台 [@hamster1963](https://github.com/hamster1963)                 |                      管理后台 [@nezhahq](https://github.com/nezhahq)                      |
+| :-------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
 | ![user](https://github.com/nezhahq/nezha/raw/master/.github/user-frontend.20241128.png) | ![admin](https://github.com/nezhahq/nezha/raw/master/.github/admin-frontend.20241220.jpg) |
-| [hamster1963/nezha-dash](https://github.com/hamster1963/nezha-dash) | [nezhahq/admin-frontend](https://github.com/nezhahq/admin-frontend) |
+|           [hamster1963/nezha-dash](https://github.com/hamster1963/nezha-dash)           |            [nezhahq/admin-frontend](https://github.com/nezhahq/admin-frontend)            |
 
 ## Acknowledgements
 
 All developers of the Nezha Probe project.
 
+<!-- prettier-ignore-start -->
 <!--GAMFC_DELIMITER--><a href="https://github.com/naiba" title="naiba"><img src="https://avatars.githubusercontent.com/u/29243953?v=4" width="50;" alt="naiba"/></a>
 <a href="https://github.com/uubulb" title="UUBulb"><img src="https://avatars.githubusercontent.com/u/35923940?v=4" width="50;" alt="UUBulb"/></a>
 <a href="https://github.com/AkkiaS7" title="Akkia"><img src="https://avatars.githubusercontent.com/u/68485070?v=4" width="50;" alt="Akkia"/></a>
@@ -115,6 +116,7 @@ All developers of the Nezha Probe project.
 <a href="https://github.com/Es-dese" title="Esdese"><img src="https://avatars.githubusercontent.com/u/71542548?v=4" width="50;" alt="Esdese"/></a>
 <a href="https://github.com/wwng2333" title=":D"><img src="https://avatars.githubusercontent.com/u/17147265?v=4" width="50;" alt=":D"/></a>
 <a href="https://github.com/wellcoming" title="Coming"><img src="https://avatars.githubusercontent.com/u/74850890?v=4" width="50;" alt="Coming"/></a><!--GAMFC_DELIMITER_END-->
+<!-- prettier-ignore-end -->
 
 ## Special Thanks
 
