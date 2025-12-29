@@ -4,9 +4,9 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "16:00"
+      interval: "daily"
+      time: "00:00"
+      timezone: "Asia/Shanghai"
     target-branch: "release"
     open-pull-requests-limit: 10
     commit-message:
@@ -15,9 +15,9 @@ updates:
   - package-ecosystem: "docker"
     directory: "/v0"
     schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "16:00"
+      interval: "daily"
+      time: "00:00"
+      timezone: "Asia/Shanghai"
     target-branch: "release"
     open-pull-requests-limit: 10
     commit-message:
@@ -26,9 +26,9 @@ updates:
   - package-ecosystem: "docker"
     directory: "/v1"
     schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "16:00"
+      interval: "daily"
+      time: "00:00"
+      timezone: "Asia/Shanghai"
     target-branch: "release"
     open-pull-requests-limit: 10
     commit-message:

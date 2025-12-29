@@ -2,71 +2,113 @@
 name: "Build v1"
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - "v1/**"
+      - "!v1/**.md"
   schedule:
     - cron: "0 16 * * *"
   workflow_dispatch:
 
-defaults:
-  run:
-    shell: bash
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
 
 env:
   IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  DOCKERHUB_REPO: ${{ secrets.DOCKER_USERNAME }}/nezha-dashboard
 
 jobs:
-  build:
-    name: "Build v1 image"
+  check:
+    name: "Pre check"
     runs-on: ubuntu-latest
     outputs:
-      pushed: ${{ steps.bump_version.outputs.build_image }}
+      trigger: ${{ steps.bump_version.outputs.trigger }}
+      nezha_version: ${{ steps.bump_version.outputs.nezha_version }}
 
     steps:
-      - name: "Check out repository"
+      - name: "Checkout repository"
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: "Fetch Versions and Determine Build"
+      # logic judge: 1. Manual
+      #              2. The version has been updated.
+      #              3. The dockerhub repo is empty.
+      #              4. Scheduled build on the 1st of every month.
+      - name: "Fetch Versions and Decide"
         id: bump_version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LATEST_VER="$(wget -qO- --tries=50 --header="Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/nezhahq/nezha/releases/latest | grep '"tag_name":' | sed -n 's/.*"tag_name": "\(v[0-9.]*\)".*/\1/p')"
-          CURRENT_VER="$(wget -qO- --tries=50 https://hub.docker.com/v2/repositories/$DOCKER_USERNAME/nezha-dashboard/tags 2>/dev/null | grep -o '"name":"[^"]*"' | awk -F'"' '$4!="latest"{print $4}' | sort -rV | head -n1 || true)"
+          set -eEuxo pipefail
+          TRIGGER="false"
+          LATEST_VER="$(wget -qO- --tries=5 --header="Authorization: token $GITHUB_TOKEN" \
+            https://api.github.com/repos/nezhahq/nezha/releases/latest | grep '"tag_name":' | sed -n 's/.*"tag_name": "\(v[0-9.]*\)".*/\1/p')"
+          CURRENT_VER="$(wget -qO- --tries=5 https://hub.docker.com/v2/repositories/$DOCKERHUB_REPO/tags 2>/dev/null | \
+            grep -o '"name":"[^"]*"' | awk -F'"' '$4!="latest"{print $4}' | sort -rV | head -n1 || true)"
           CURRENT_DAY="$(date -u '+%d' -d '+8 hours')"
+
           echo "nezha_version=${LATEST_VER}" >> "$GITHUB_OUTPUT"
-          if [[ "$(printf '%s\n%s\n' "$LATEST_VER" "$CURRENT_VER" | sort -V | head -n1)" != "$LATEST_VER" || -z "$CURRENT_VER" && -n "$LATEST_VER" || "$CURRENT_DAY" == "01" ]]; then
-            echo "build_image=1" >> "$GITHUB_OUTPUT"
+          if [[ "$(printf '%s\n%s\n' "$LATEST_VER" "$CURRENT_VER" | sort -V | head -n1)" != "$LATEST_VER" ]] || \
+            [[ -z "$CURRENT_VER" && -n "$LATEST_VER" ]] || [[ "$CURRENT_DAY" == "01" ]] || \
+            [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Build required."
+            TRIGGER="true"
+          else
+            echo "No build required."
           fi
+          echo "trigger=${TRIGGER}" >> "$GITHUB_OUTPUT"
 
-      - name: "Fetch ipinfo geoip database"
-        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
-        working-directory: ${{ github.workspace }}/v1
-        run: wget --tries=50 --no-check-certificate -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
+  build:
+    needs:
+      - check
+    if: needs.check.outputs.trigger == 'true'
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { os: ubuntu-latest, platform: linux/amd64 }
+          - { os: ubuntu-24.04-arm, platform: linux/arm64 }
+    runs-on: ${{ matrix.os }}
+    name: "Build image"
 
-      - name: "Set up Docker QEMU"
-        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
-        uses: docker/setup-qemu-action@v3
+    steps:
+      - name: "Prepare"
+        run: |
+          PLATFORM=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${PLATFORM//\//-}" >> "$GITHUB_ENV"
 
-      - name: "Set up Docker Buildx"
-        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
+      - name: "Checkout repository"
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: "Fetch ipinfo geoip db"
+        working-directory: v1
+        run: |
+          set -eEuxo pipefail
+          wget --tries=5 --no-check-certificate -qO geoip.db https://ipinfo.io/data/free/country.mmdb?token=${IPINFO_TOKEN}
+
+      - name: "Setup Docker Buildx"
         uses: docker/setup-buildx-action@v3
 
       - name: "Login to DockerHub"
-        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v3
         with:
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: "Extract Docker metadata"
-        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
+      - name: "Docker metadata"
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_USERNAME }}/nezha-dashboard
+          images: ${{ env.DOCKERHUB_REPO }}
           tags: |
-            type=raw,value=${{ steps.bump_version.outputs.nezha_version }}
+            type=raw,value=${{ needs.check.outputs.nezha_version }}
             type=raw,value=latest
           labels: |
             org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
@@ -74,22 +116,84 @@ jobs:
             org.opencontainers.image.title=Nezha
             org.opencontainers.image.url=https://nezha.wiki
 
-      - name: "Build and Push nezha-dashboard image"
-        if: steps.bump_version.outputs.build_image == '1' || github.event_name == 'workflow_dispatch'
+      - name: "Build and export"
+        id: build
         uses: docker/build-push-action@v6
         with:
-          context: ${{ github.workspace }}/v1
-          file: ${{ github.workspace }}/v1/Dockerfile
-          platforms: linux/amd64, linux/arm64
-          build-args: NEZHA_VERSION=${{ steps.bump_version.outputs.nezha_version }}
-          tags: ${{ steps.meta.outputs.tags }}
+          context: v1/
+          platforms: ${{ matrix.platform }}
+          build-args: NEZHA_VERSION=${{ needs.check.outputs.nezha_version }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: ${{ github.event_name != 'pull_request' }}
+          outputs: type=image,name=${{ env.DOCKERHUB_REPO }},push-by-digest=true,name-canonical=true,push=true
+
+      - name: "Export digest"
+        run: |
+          rm -rf /tmp/digests
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: digest-${{ env.PLATFORM_PAIR }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    needs:
+      - check
+      - build
+    runs-on: ubuntu-latest
+    name: "Merge manifest"
+
+    steps:
+      - name: "Download digests"
+        uses: actions/download-artifact@v7
+        with:
+          path: /tmp/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - name: "Setup Docker Buildx"
+        uses: docker/setup-buildx-action@v3
+
+      - name: "Login to DockerHub"
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: "Docker metadata"
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKERHUB_REPO }}
+          tags: |
+            type=raw,value=${{ needs.check.outputs.nezha_version }}
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
+            org.opencontainers.image.source=https://github.com/nezhahq/nezha
+            org.opencontainers.image.title=Nezha
+            org.opencontainers.image.url=https://nezha.wiki
+
+      - name: "Create manifest list and push"
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.DOCKERHUB_REPO }}@sha256:%s ' *)
+
+      - name: "Inspect image"
+        run: |
+          docker buildx imagetools inspect ${{ env.DOCKERHUB_REPO }}:${{ needs.check.outputs.nezha_version }}
 
   sync:
-    name: "Sync readme to dockerhub"
     needs:
-      - build
-    if: needs.build.outputs.pushed == '1' || github.event_name == 'workflow_dispatch'
+      - merge
+    name: "Sync to Dockerhub"
     uses: ./.github/workflows/sync-readme.yaml
     secrets: inherit
