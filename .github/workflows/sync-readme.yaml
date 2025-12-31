@@ -5,10 +5,6 @@ on:
   workflow_call:
   workflow_dispatch:
 
-concurrency:
-  group: sync-readme
-  cancel-in-progress: true
-
 jobs:
   sync:
     runs-on: ubuntu-latest
