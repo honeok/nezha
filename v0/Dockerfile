@@ -11,7 +11,7 @@ LABEL maintainer="honeok <i@honeok.com>"
 RUN set -ex \
     && apk add --update --no-cache ca-certificates tzdata
 
-FROM golang:1.25-alpine AS builder
+FROM golang:1.26-alpine AS builder
 LABEL maintainer="honeok <i@honeok.com>"
 ARG NEZHA_VERSION=""
 WORKDIR /go/src/github.com/naiba/nezha
