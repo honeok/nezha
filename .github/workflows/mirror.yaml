@@ -3,9 +3,15 @@ name: "GitHub Actions Mirror"
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   mirror_to_framagit:
@@ -23,9 +29,9 @@ jobs:
         with:
           REMOTE: git@framagit.org:${{ github.repository }}.git
           GIT_SSH_PRIVATE_KEY: ${{ secrets.SYNC_PRIVATE_KEY }}
-          GIT_PUSH_ARGS: --force --prune
           GIT_SSH_NO_VERIFY_HOST: true
           PUSH_ALL_REFS: false
+          GIT_PUSH_ARGS: "--force --prune"
 
   mirror_to_codeberg:
     name: "Mirror to codeberg"
@@ -42,6 +48,6 @@ jobs:
         with:
           REMOTE: git@codeberg.org:${{ github.repository }}.git
           GIT_SSH_PRIVATE_KEY: ${{ secrets.SYNC_PRIVATE_KEY }}
-          GIT_PUSH_ARGS: --force --prune
           GIT_SSH_NO_VERIFY_HOST: true
           PUSH_ALL_REFS: false
+          GIT_PUSH_ARGS: "--force --prune"
