@@ -3,14 +3,18 @@ name: "Shellcheck"
 
 on:
   push:
-    branches:
-      - "**"
-    paths:
-      - "**/*.sh"
+    branches: [master, release]
+    paths: ["**/*.sh"]
   pull_request:
-    paths:
-      - "**/*.sh"
+    paths: ["**/*.sh"]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   shellcheck:
@@ -18,8 +22,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "Check out repository"
+      - name: "Checkout repository"
         uses: actions/checkout@v6
 
       - name: "Run shellcheck"
-        uses: ludeeus/action-shellcheck@master
+        uses: luizm/action-sh-checker@master
+        env:
+          SHFMT_OPTS: -i 4 -sr

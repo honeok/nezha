@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
-
+#
 # Description: This script is used to replace the unpkg and bytedance static resource public library address.
 # Copyright (c) 2025 honeok <i@honeok.com>
 
@@ -16,9 +16,9 @@ sed -i 's#https://unpkg.com/font-logos@0.17.0/assets/font-logos.css#https://cdnj
 
 # dashboard-default
 if [ -f resource/template/dashboard-default/file.html ]; then
-	MDUI_VERSION="$(wget -qO- https://api.cdnjs.com/libraries/mdui | sed -n 's/.*"version": *"\([^"]*\)".*/\1/p')"
-	sed -i "s#https://unpkg.com/mdui@2/mdui.css#https://cdnjs.cloudflare.com/ajax/libs/mdui/$MDUI_VERSION/mdui.css#g" resource/template/dashboard-default/file.html
-	sed -i "s#https://unpkg.com/mdui@2/mdui.global.js#https://cdnjs.cloudflare.com/ajax/libs/mdui/$MDUI_VERSION/mdui.global.js#g" resource/template/dashboard-default/file.html
+    MDUI_VERSION="$(wget -qO- https://api.cdnjs.com/libraries/mdui | sed -n 's/.*"version": *"\([^"]*\)".*/\1/p')"
+    sed -i "s#https://unpkg.com/mdui@2/mdui.css#https://cdnjs.cloudflare.com/ajax/libs/mdui/$MDUI_VERSION/mdui.css#g" resource/template/dashboard-default/file.html
+    sed -i "s#https://unpkg.com/mdui@2/mdui.global.js#https://cdnjs.cloudflare.com/ajax/libs/mdui/$MDUI_VERSION/mdui.global.js#g" resource/template/dashboard-default/file.html
 fi
 
 sed -i 's#https://unpkg.com/clipboard@2.0.11/dist/clipboard.min.js#https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js#g' resource/template/dashboard-default/server.html

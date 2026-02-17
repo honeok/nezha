@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # SPDX-License-Identifier: Apache-2.0
-# Copyright (c) 2025-2026 honeok <i@honeok.com>
+# Copyright (c) 2026 honeok <i@honeok.com>
 #
 # References:
 # https://github.com/nezhahq/nezha
@@ -15,15 +15,16 @@ WORKDIR /go/src/github.com/nezhahq/nezha
 ENV CGO_ENABLED=1
 ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE=1"
 RUN set -ex \
-    && apk add --update --no-cache bash curl git gcc musl-dev yq-go \
+    && apk add --update --no-cache bash curl git gcc musl-dev yq-go zstd-static \
     && git clone --depth=1 --branch "$NEZHA_VERSION" https://github.com/nezhahq/nezha.git .
 COPY geoip.db pkg/geoip/geoip.db
 RUN set -ex \
     && chmod +x ./script/fetch-frontends.sh \
     && ./script/fetch-frontends.sh \
     && go install github.com/swaggo/swag/cmd/swag@latest \
-    && swag init --pd -d . -g ./cmd/dashboard/main.go -o ./cmd/dashboard/docs --parseGoList=false \
+    && swag init --pd -d cmd/dashboard -g main.go -o cmd/dashboard/docs \
     && go mod tidy -v \
+    && find /go/pkg/mod/github.com/valyala/gozstd* -name "libzstd_linux_*.a" -exec cp -f /usr/lib/libzstd.a {} \; \
     && go build -v -trimpath -ldflags="-s -w -buildid= \
         -extldflags '-static -fpic' -X 'github.com/nezhahq/nezha/service/singleton.Version=${NEZHA_VERSION#v}' \
         " -o /go/bin/dashboard ./cmd/dashboard

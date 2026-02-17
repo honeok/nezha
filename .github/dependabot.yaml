@@ -7,8 +7,8 @@ updates:
       interval: "daily"
       time: "00:00"
       timezone: "Asia/Shanghai"
-    target-branch: "release"
     open-pull-requests-limit: 10
+    target-branch: "release"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -18,15 +18,13 @@ updates:
           - "*"
 
   - package-ecosystem: "docker"
-    directories:
-      - "/v0"
-      - "/v1"
+    directories: ["/v0", "/v1", "/v2"]
     schedule:
       interval: "daily"
       time: "00:00"
       timezone: "Asia/Shanghai"
-    target-branch: "release"
     open-pull-requests-limit: 10
+    target-branch: "release"
     commit-message:
       prefix: "chore"
       include: "scope"

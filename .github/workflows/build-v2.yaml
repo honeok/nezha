@@ -1,12 +1,12 @@
 ---
-name: "Build v1"
+name: "Build v2"
 
 on:
   push:
     branches: [master]
     paths:
-      - "v1/**"
-      - "!v1/**.md"
+      - "v2/**"
+      - "!v2/**.md"
   schedule:
     - cron: "0 16 * * *"
   workflow_dispatch:
@@ -22,8 +22,7 @@ env:
   DOCKERHUB_REPO: ${{ secrets.DOCKER_USERNAME || github.repository_owner }}/nezha-dashboard
   IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
   TZ: Asia/Shanghai
-  V1_VERSION: v1.14.14
-  WORK_DIR: v1
+  WORK_DIR: v2
 
 jobs:
   check:
@@ -31,19 +30,27 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       renew: ${{ steps.vers.outputs.renew }}
+      nezha_version: ${{ steps.vers.outputs.nezha_version }}
 
     steps:
       - name: "Fetch Versions and Decide"
         id: vers
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -eEuxo pipefail
           RENEW="false"
+          MAJOR_VERSION="v2"
+          LATEST_VER="$(gh release view -R nezhahq/nezha --json tagName -q .tagName 2>/dev/null | grep "^$MAJOR_VERSION")"
+          CURRENT_VER="$(skopeo list-tags "docker://docker.io/$DOCKERHUB_REPO" 2>/dev/null | jq -r '.Tags[]' | grep -v '^latest$' | sort -rV | head -n 1 || true)"
           CURRENT_DAY="$(date -u '+%d')"
-          if [[ "$CURRENT_DAY" == "01" ]]; then
+          if [[ "$(printf '%s\n%s\n' "$LATEST_VER" "$CURRENT_VER" | sort -V | head -n1)" != "$LATEST_VER" ]] || \
+            [[ -z "$CURRENT_VER" && -n "$LATEST_VER" ]] || [[ "$CURRENT_DAY" == "01" ]]; then
             echo "Build required."
             RENEW="true"
           fi
           echo "renew=$RENEW" >> "$GITHUB_OUTPUT"
+          echo "nezha_version=$LATEST_VER" >> "$GITHUB_OUTPUT"
 
   build:
     name: "Build image"
@@ -96,7 +103,8 @@ jobs:
         with:
           images: ${{ env.DOCKERHUB_REPO }}
           tags: |
-            type=raw,value=${{ env.V1_VERSION }}
+            type=raw,value=${{ needs.check.outputs.nezha_version }}
+            type=raw,value=latest
           labels: |
             org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
             org.opencontainers.image.source=https://github.com/nezhahq/nezha
@@ -110,7 +118,7 @@ jobs:
           context: ${{ env.WORK_DIR }}
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: NEZHA_VERSION=${{ env.V1_VERSION }}
+          build-args: NEZHA_VERSION=${{ needs.check.outputs.nezha_version }}
           outputs: type=image,name=${{ env.DOCKERHUB_REPO }},push-by-digest=true,name-canonical=true,push=true
 
       - name: "Export digest"
@@ -123,7 +131,7 @@ jobs:
       - name: "Upload artifact"
         uses: actions/upload-artifact@v6
         with:
-          name: digest-${{ env.V1_VERSION }}-${{ env.PLATFORM_PAIR }}
+          name: digest-${{ needs.check.outputs.nezha_version }}-${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -132,13 +140,15 @@ jobs:
     name: "Merge manifest"
     runs-on: ubuntu-latest
     needs: [check, build]
+    permissions:
+      packages: write
 
     steps:
       - name: "Download digests"
         uses: actions/download-artifact@v7
         with:
           path: /tmp/digests
-          pattern: digest-${{ env.V1_VERSION }}-*
+          pattern: digest-${{ needs.check.outputs.nezha_version }}-*
           merge-multiple: true
 
       - name: "Setup Docker Buildx"
@@ -157,7 +167,8 @@ jobs:
         with:
           images: ${{ env.DOCKERHUB_REPO }}
           tags: |
-            type=raw,value=${{ env.V1_VERSION }}
+            type=raw,value=${{ needs.check.outputs.nezha_version }}
+            type=raw,value=latest
           labels: |
             org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
             org.opencontainers.image.source=https://github.com/nezhahq/nezha
@@ -173,4 +184,4 @@ jobs:
 
       - name: "Inspect image"
         run: |
-          docker buildx imagetools inspect ${{ env.DOCKERHUB_REPO }}:${{ env.V1_VERSION }}
+          docker buildx imagetools inspect ${{ env.DOCKERHUB_REPO }}:${{ needs.check.outputs.nezha_version }}

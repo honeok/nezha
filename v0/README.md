@@ -30,16 +30,22 @@
 
 ```shell
 case "$(uname -m)" in
-    x86_64|amd64) SYS_ARCH="amd64" ;;
-    armv8*|arm64|aarch64) SYS_ARCH="arm64" ;;
-    s390x) SYS_ARCH="s390x" ;;
-    *) echo 2>&1 "Arch not supported."; exit 1 ;;
-esac \
-&& curl -LO "https://github.com/nezhahq/agent/releases/download/v0.20.5/nezha-agent_linux_$SYS_ARCH.zip" \
-&& unzip -o "nezha-agent_linux_$SYS_ARCH.zip" -d /opt/nezha/agent \
-&& rm -f nezha-agent* \
-&& systemctl daemon-reload \
-&& systemctl restart nezha-agent.service
+x86_64 | amd64)
+    SYS_ARCH="amd64"
+    ;;
+armv8* | arm64 | aarch64)
+    SYS_ARCH="arm64"
+    ;;
+*)
+    echo 2>&1 "Arch not supported."
+    exit 1
+    ;;
+esac &&
+    curl -Ls -O "https://github.com/nezhahq/agent/releases/download/v0.20.5/nezha-agent_linux_$SYS_ARCH.zip" &&
+    unzip -qo "nezha-agent_linux_$SYS_ARCH.zip" -d /opt/nezha/agent &&
+    rm -f nezha-agent* &&
+    systemctl daemon-reload &&
+    systemctl restart nezha-agent.service
 ```
 
 ## 致谢
