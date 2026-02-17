@@ -1,0 +1,187 @@
+---
+name: "Build v2"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "v2/**"
+      - "!v2/**.md"
+  schedule:
+    - cron: "0 16 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOCKERHUB_REPO: ${{ secrets.DOCKER_USERNAME || github.repository_owner }}/nezha-dashboard
+  IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
+  TZ: Asia/Shanghai
+  WORK_DIR: v2
+
+jobs:
+  check:
+    name: "Pre check"
+    runs-on: ubuntu-latest
+    outputs:
+      renew: ${{ steps.vers.outputs.renew }}
+      nezha_version: ${{ steps.vers.outputs.nezha_version }}
+
+    steps:
+      - name: "Fetch Versions and Decide"
+        id: vers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eEuxo pipefail
+          RENEW="false"
+          MAJOR_VERSION="v2"
+          LATEST_VER="$(gh release view -R nezhahq/nezha --json tagName -q .tagName 2>/dev/null | grep "^$MAJOR_VERSION")"
+          CURRENT_VER="$(skopeo list-tags "docker://docker.io/$DOCKERHUB_REPO" 2>/dev/null | jq -r '.Tags[]' | grep -v '^latest$' | sort -rV | head -n 1 || true)"
+          CURRENT_DAY="$(date -u '+%d')"
+          if [[ "$(printf '%s\n%s\n' "$LATEST_VER" "$CURRENT_VER" | sort -V | head -n1)" != "$LATEST_VER" ]] || \
+            [[ -z "$CURRENT_VER" && -n "$LATEST_VER" ]] || [[ "$CURRENT_DAY" == "01" ]]; then
+            echo "Build required."
+            RENEW="true"
+          fi
+          echo "renew=$RENEW" >> "$GITHUB_OUTPUT"
+          echo "nezha_version=$LATEST_VER" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: "Build image"
+    needs: [check]
+    if: needs.check.outputs.renew == 'true' || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { os: ubuntu-24.04, platform: linux/amd64 }
+          - { os: ubuntu-24.04-arm, platform: linux/arm64 }
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: "Prepare"
+        run: |
+          PLATFORM_PAIR="$(awk -F/ '{print $1"-"$2$3}' <<< ${{ matrix.platform }})"
+          echo "PLATFORM_PAIR=$PLATFORM_PAIR" >> "$GITHUB_ENV"
+
+      - name: "Checkout repository"
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: "Stage build assets"
+        working-directory: ${{ env.WORK_DIR }}
+        run: |
+          set -eEuxo pipefail
+          cp $GITHUB_WORKSPACE/scripts/docker-entrypoint.sh .
+
+      - name: "Fetch geoip db"
+        working-directory: ${{ env.WORK_DIR }}
+        run: |
+          set -eEuxo pipefail
+          curl -Ls -k "https://ipinfo.io/data/free/country.mmdb?token=$IPINFO_TOKEN" -o geoip.db
+
+      - name: "Setup Docker Buildx"
+        uses: docker/setup-buildx-action@v3
+
+      - name: "Login to DockerHub"
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: "Docker metadata"
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKERHUB_REPO }}
+          tags: |
+            type=raw,value=${{ needs.check.outputs.nezha_version }}
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
+            org.opencontainers.image.source=https://github.com/nezhahq/nezha
+            org.opencontainers.image.title=Nezha
+            org.opencontainers.image.url=https://nezha.wiki
+
+      - name: "Build and export"
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.WORK_DIR }}
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: NEZHA_VERSION=${{ needs.check.outputs.nezha_version }}
+          outputs: type=image,name=${{ env.DOCKERHUB_REPO }},push-by-digest=true,name-canonical=true,push=true
+
+      - name: "Export digest"
+        run: |
+          rm -rf /tmp/digests
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: digest-${{ needs.check.outputs.nezha_version }}-${{ env.PLATFORM_PAIR }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    name: "Merge manifest"
+    runs-on: ubuntu-latest
+    needs: [check, build]
+    permissions:
+      packages: write
+
+    steps:
+      - name: "Download digests"
+        uses: actions/download-artifact@v7
+        with:
+          path: /tmp/digests
+          pattern: digest-${{ needs.check.outputs.nezha_version }}-*
+          merge-multiple: true
+
+      - name: "Setup Docker Buildx"
+        uses: docker/setup-buildx-action@v3
+
+      - name: "Login to DockerHub"
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: "Docker metadata"
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKERHUB_REPO }}
+          tags: |
+            type=raw,value=${{ needs.check.outputs.nezha_version }}
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.description=Nezha monitoring is self-hosted, lightweight server and website monitoring and O&M tool
+            org.opencontainers.image.source=https://github.com/nezhahq/nezha
+            org.opencontainers.image.title=Nezha
+            org.opencontainers.image.url=https://nezha.wiki
+
+      - name: "Create manifest list and push"
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.DOCKERHUB_REPO }}@sha256:%s ' *)
+
+      - name: "Inspect image"
+        run: |
+          docker buildx imagetools inspect ${{ env.DOCKERHUB_REPO }}:${{ needs.check.outputs.nezha_version }}
