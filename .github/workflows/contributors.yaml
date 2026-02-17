@@ -7,12 +7,18 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   sync:
     name: "Sync contributors"
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: "Check out repository"
@@ -40,7 +46,7 @@ jobs:
         with:
           commit_message: "docs: sync contributors by github actions"
           branch: release
-          commit_options: "--signoff --no-verify"
-          commit_user_name: github-actions[bot]
-          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
-          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          commit_options: "--no-verify --signoff"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
