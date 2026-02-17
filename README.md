@@ -1,6 +1,6 @@
 <div align="center">
   <br>
-  <img width="360" style="max-width:80%" src="https://github.com/nezhahq/nezha/raw/master/.github/brand.svg" title="哪吒监控 Nezha Monitoring">
+  <img width="360" style="max-width:80%" src="https://fastly.jsdelivr.net/gh/nezhahq/nezha@master/.github/brand.svg" title="哪吒监控 Nezha Monitoring">
   <br>
   <small><i>LOGO designed by <a href="https://xio.ng" target="_blank">熊大</a> .</i></small>
   <br><br>
@@ -9,12 +9,12 @@
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build-v0.yaml?style=flat-square&branch=master&logo=github" alt="Build Status" />
-  <img src="https://img.shields.io/github/v/tag/honeok/nezha.svg?style=flat-square&label=release&logo=github&color=blue" alt="GitHub Release" />
-  <img src="https://img.shields.io/github/license/honeok/nezha.svg?style=flat-square&logo=github" alt="License" />
-  <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Pulls" />
-  <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Size" />
-  <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?style=flat-square&logo=docker&color=blue&logoColor=white" alt="Docker Image Version" />
+  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build-v0.yaml?branch=master&logo=github" alt="Build Status" />
+  <img src="https://img.shields.io/github/v/release/honeok/nezha.svg?logo=github&color=blue" alt="GitHub Release" />
+  <img src="https://img.shields.io/github/license/honeok/nezha.svg?logo=github" alt="License" />
+  <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?logo=docker&color=blue&logoColor=white" alt="Docker Pulls" />
+  <img src="https://img.shields.io/docker/image-size/honeok/nezha-dashboard.svg?logo=docker&color=blue&logoColor=white" alt="Docker Image Size" />
+  <img src="https://img.shields.io/docker/v/honeok/nezha-dashboard.svg?logo=docker&color=blue&logoColor=white" alt="Docker Image Version" />
 </div>
 
 ## Purpose
@@ -23,7 +23,7 @@ The sole purpose of this Docker image is to update the GeoIP database to correct
 
 This image is automatically built at the beginning of each month.
 
-This repository builds both `v0` and `v1` versions, ensuring the GeoIP database is always kept up-to-date.
+This repository builds `v0`, `v1`, and `v2` versions, ensuring the GeoIP database is always kept up-to-date.
 
 ## Pull the image
 
@@ -41,7 +41,7 @@ docker pull honeok/nezha-dashboard
 |                         **Neko Mdui [@MikoyChinese](https://github.com/MikoyChinese)**                         |                                **AngelKanade [@adminsama](https://github.com/adminsama)**                                 |                                 **ServerStatus [@unclezs](https://github.com/unclezs)**                                  |
 |    ![Neko Mdui](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-mdui/screenshot.png)     |     ![AngelKanade](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-angel-kanade/screenshot.png)     |   ![默认主题魔改](https://github.com/nezhahq/nezha/raw/v0-final/resource/template/theme-server-status/screenshot.png)    |
 
-## Screenshots (from v1)
+## Screenshots (from v1,v2)
 
 |                 用户前台 [@hamster1963](https://github.com/hamster1963)                 |                      管理后台 [@nezhahq](https://github.com/nezhahq)                      |
 | :-------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
