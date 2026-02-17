@@ -2,17 +2,35 @@
 name: "Sync README"
 
 on:
+  push:
+    branches: [master]
+    paths:
+      - "README.md"
+  schedule:
+    - cron: "0 16 * * *"
   workflow_call:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOCKERHUB_REPO: ${{ secrets.DOCKER_USERNAME || github.repository_owner }}/nezha-dashboard
+
 jobs:
   sync:
+    name: "Sync readme to dockerhub"
     runs-on: ubuntu-latest
 
     steps:
-      - name: "Check out repository"
+      - name: "Checkout repository"
         uses: actions/checkout@v6
         with:
+          ref: release
           fetch-depth: 0
 
       - name: "Sync readme to dockerhub"
@@ -20,6 +38,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ secrets.DOCKER_USERNAME }}/nezha-dashboard
+          repository: ${{ env.DOCKERHUB_REPO }}
           readme-filepath: ./README.md
           enable-url-completion: false
