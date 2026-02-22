@@ -38,7 +38,7 @@ jobs:
         run: |
           set -eEuxo pipefail
           RENEW="false"
-          CURRENT_DAY="$(date -u '+%d')"
+          CURRENT_DAY="$(date '+%d')"
           if [[ "$CURRENT_DAY" == "01" ]]; then
             echo "Build required."
             RENEW="true"
