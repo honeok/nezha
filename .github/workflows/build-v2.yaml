@@ -129,7 +129,7 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: "Upload artifact"
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: digest-${{ needs.check.outputs.nezha_version }}-${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
@@ -145,7 +145,7 @@ jobs:
 
     steps:
       - name: "Download digests"
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           pattern: digest-${{ needs.check.outputs.nezha_version }}-*
