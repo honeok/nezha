@@ -25,20 +25,20 @@ check_root() {
 }
 
 curl() {
-    local RC
+    local rc
 
     # 添加 --fail 不然404退出码也为0
     # 32位cygwin已停止更新, 证书可能有问题, 添加 --insecure
     # centos7 curl 不支持 --retry-connrefused --retry-all-errors 因此手动 retry
     for ((i = 1; i <= 5; i++)); do
         command curl --connect-timeout 10 --fail --insecure "$@"
-        RC="$?"
-        if [ "$RC" -eq 0 ]; then
+        rc="$?"
+        if [ "$rc" -eq 0 ]; then
             return
         else
             # 403 404 错误或达到重试次数
-            if [ "$RC" -eq 22 ] || [ "$i" -eq 5 ]; then
-                return "$RC"
+            if [ "$rc" -eq 22 ] || [ "$i" -eq 5 ]; then
+                return "$rc"
             fi
             sleep 0.5
         fi
@@ -107,43 +107,43 @@ check_cdn() {
 
 # 更新内核
 update_core() {
-    local LATEST_VER CURRENT_VER
+    local latest_ver current_ver
 
     for ((i = 1; i <= 5; i++)); do
-        LATEST_VER="$(curl -Ls "${GITHUB_PROXY}https://api.github.com/repos/$GITHUB_REPO/releases" | sed -n 's/.*"tag_name": *"v\([^"]*\)".*/\1/p' | sort -rV | head -n 1)"
-        if grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+' <<< "$LATEST_VER"; then
+        latest_ver="$(curl -Ls "${GITHUB_PROXY}https://api.github.com/repos/$GITHUB_REPO/releases" | sed -n 's/.*"tag_name": *"v\([^"]*\)".*/\1/p' | sort -rV | head -n 1)"
+        if grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+' <<< "$latest_ver"; then
             break
         fi
         sleep 0.5
     done
-    CURRENT_VER="$(eval "$CORE_DIR/$CORE_NAME" -v | awk '{print $3}')"
+    current_ver="$(eval "$CORE_DIR/$CORE_NAME" -v | awk '{print $3}')"
 
-    if [[ "$(printf '%s\n%s\n' "$LATEST_VER" "$CURRENT_VER" | sort -V | head -n1)" == "$LATEST_VER" ]]; then
+    if [[ "$(printf '%s\n%s\n' "$latest_ver" "$current_ver" | sort -V | head -n1)" == "$latest_ver" ]]; then
         return
     fi
 
-    curl -L -O "${GITHUB_PROXY}https://github.com/$GITHUB_REPO/releases/download/v$LATEST_VER/${CORE_NAME}_${OS_NAME}_${OS_ARCH}.zip"
-    curl -L -O "${GITHUB_PROXY}https://github.com/$GITHUB_REPO/releases/download/v$LATEST_VER/checksums.txt"
+    curl -L -O "${GITHUB_PROXY}https://github.com/$GITHUB_REPO/releases/download/v$latest_ver/${CORE_NAME}_${OS_NAME}_${OS_ARCH}.zip"
+    curl -L -O "${GITHUB_PROXY}https://github.com/$GITHUB_REPO/releases/download/v$latest_ver/checksums.txt"
     grep "${CORE_NAME}_${OS_NAME}_${OS_ARCH}.zip" checksums.txt | sha256sum -c - > /dev/null 2>&1
 
     unzip -qo "${CORE_NAME}_${OS_NAME}_${OS_ARCH}.zip" -d "$CORE_DIR"
     chmod +x "$CORE_DIR/$CORE_NAME" > /dev/null 2>&1
 }
 
-restart_agent() {
-    local RESTART_CMD
+restart_core() {
+    local restart_cmd
 
     # shellcheck disable=SC1091
     . /etc/os-release
 
     if [ "$ID" = "alpine" ] || [ "$ID" = "immortalwrt" ] || [ "$ID" = "openwrt" ]; then
-        RESTART_CMD="/etc/init.d/$CORE_NAME restart"
+        restart_cmd="/etc/init.d/$CORE_NAME restart"
     else
-        RESTART_CMD="systemctl restart $CORE_NAME.service --quiet"
+        restart_cmd="systemctl restart $CORE_NAME.service --quiet"
     fi
 
     for ((i = 1; i <= 3; i++)); do
-        if eval "$RESTART_CMD" > /dev/null 2>&1; then
+        if eval "$restart_cmd" > /dev/null 2>&1; then
             return
         fi
         if [ "$i" -lt 3 ]; then
@@ -159,4 +159,4 @@ check_sys
 check_arch
 check_cdn
 update_core
-restart_agent
+restart_core
