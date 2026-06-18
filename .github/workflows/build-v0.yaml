@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: "checkout repository"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -70,7 +70,7 @@ jobs:
           fi
 
       - name: "checkout nezha src"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: nezhahq/nezha
           ref: ${{ matrix.nezha_tag }}
@@ -162,7 +162,7 @@ jobs:
           echo "PLATFORM_PAIR=$PLATFORM_PAIR" >> "$GITHUB_ENV"
 
       - name: "Checkout repository"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
