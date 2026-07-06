@@ -5,11 +5,11 @@
 # References:
 # https://github.com/nezhahq/nezha
 
-FROM alpine:latest AS deps
+FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS deps
 RUN set -ex \
     && apk add --update --no-cache ca-certificates tzdata
 
-FROM golang:1.26-alpine AS builder
+FROM golang:1.26.4-alpine@sha256:3ad57304ad93bbec8548a0437ad9e06a455660655d9af011d58b993f6f615648 AS builder
 ARG NEZHA_VERSION=""
 WORKDIR /go/src/github.com/nezhahq/nezha
 ENV CGO_ENABLED=1
@@ -29,7 +29,7 @@ RUN set -ex \
         -extldflags '-static -fpic' -X 'github.com/nezhahq/nezha/service/singleton.Version=${NEZHA_VERSION#v}' \
         " -o /go/bin/dashboard ./cmd/dashboard
 
-FROM busybox:stable-musl AS dist
+FROM busybox:1.38.0-musl@sha256:8635836765b0c4c43970660219739baa58b0883c2e429e4b8918f7dd1519455c AS dist
 LABEL org.opencontainers.image.authors="honeok <i@honeok.com>"
 ARG TZ=Asia/Shanghai
 WORKDIR /dashboard
