@@ -1,0 +1,13 @@
+---
+services:
+  nezha-dashboard:
+    image: honeok/nezha-dashboard:v2.2.8
+    container_name: nezha-dashboard
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:8008:8008
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - $PWD/data:/dashboard/data
+    network_mode: bridge
