@@ -30,7 +30,7 @@ jobs:
       - name: "Checkout repository"
         uses: actions/checkout@v7
         with:
-          ref: release
+          ref: dev
           fetch-depth: 0
 
       - name: "Sync readme to dockerhub"

@@ -24,7 +24,7 @@ jobs:
       - name: "Check out repository"
         uses: actions/checkout@v7
         with:
-          ref: release
+          ref: dev
           fetch-depth: 0
 
       - name: "Comparing contributors"
@@ -45,7 +45,7 @@ jobs:
         if: env.IS_RENEW == 1
         with:
           commit_message: "docs: sync contributors by github actions"
-          branch: release
+          branch: dev
           commit_options: "--no-verify --signoff"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
