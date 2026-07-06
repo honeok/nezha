@@ -9,7 +9,6 @@
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/github/actions/workflow/status/honeok/nezha/build-v0.yaml?branch=master&logo=github" alt="Build Status" />
   <img src="https://img.shields.io/github/v/release/honeok/nezha.svg?logo=github&color=blue" alt="GitHub Release" />
   <img src="https://img.shields.io/github/license/honeok/nezha.svg?logo=github" alt="License" />
   <img src="https://img.shields.io/docker/pulls/honeok/nezha-dashboard.svg?logo=docker&color=blue&logoColor=white" alt="Docker Pulls" />
