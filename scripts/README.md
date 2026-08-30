@@ -13,5 +13,5 @@ bash <(curl -fsSL https://github.com/honeok/nezha/raw/master/scripts/update-agen
 Use jsdmirror CDN.
 
 ```shell
-bash <(curl -fsSL https://cdn.jsdmirror.com/honeok/nezha@master/scripts/update-agent.sh)
+bash <(curl -fsSL https://cdn.jsdmirror.com/gh/honeok/nezha@master/scripts/update-agent.sh)
 ```
