@@ -9,7 +9,7 @@ FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6ee
 RUN set -ex \
     && apk add --update --no-cache ca-certificates tzdata
 
-FROM golang:1.27-alpine@sha256:26402d86be3d72e6a9410afa0108f03529f51f0c1b5eb7f503d0bc44cc7857ac AS builder
+FROM golang:1.27-alpine@sha256:cf6fca6641884b8433441b2b0652976f975e1d0fdd26d177eaaf8596087f3125 AS builder
 ARG NEZHA_VERSION=""
 WORKDIR /go/src/github.com/nezhahq/nezha
 ENV CGO_ENABLED=1
