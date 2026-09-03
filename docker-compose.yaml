@@ -1,7 +1,7 @@
 ---
 services:
   nezha-dashboard:
-    image: honeok/nezha-dashboard:v2.3.7
+    image: honeok/nezha-dashboard:v2.3.8
     container_name: nezha-dashboard
     restart: unless-stopped
     ports:
