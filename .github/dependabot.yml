@@ -4,8 +4,8 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "00:00"
+      interval: "cron"
+      cronjob: "0 0 * * *"
       timezone: "Asia/Shanghai"
     open-pull-requests-limit: 10
     target-branch: "dev"
@@ -20,8 +20,8 @@ updates:
   - package-ecosystem: "docker"
     directories: ["/v0", "/v1", "/v2"]
     schedule:
-      interval: "daily"
-      time: "00:00"
+      interval: "cron"
+      cronjob: "0 0 * * *"
       timezone: "Asia/Shanghai"
     open-pull-requests-limit: 10
     target-branch: "dev"
@@ -36,14 +36,17 @@ updates:
   - package-ecosystem: "docker-compose"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "00:00"
+      interval: "cron"
+      cronjob: "0 0 * * *"
       timezone: "Asia/Shanghai"
     open-pull-requests-limit: 10
     target-branch: "dev"
     commit-message:
       prefix: "chore"
       include: "scope"
+    cooldown:
+      exclude:
+        - "*"
     groups:
       docker-compose:
         patterns:
